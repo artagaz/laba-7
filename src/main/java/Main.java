@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         //parsing JSON
@@ -21,79 +21,84 @@ public class Main {
 
         Person[] person = gson.fromJson(reader, Person[].class);
 
+        //Selector
         int Select = 0;
         try {
             Select = scanner.nextInt();
         } catch (Exception ignored) {
         }
 
-        switch (Select){
+        switch (Select) {
 
             case 1:
+                //visitors list and count
                 ArrayList<String> visitors = new ArrayList<>();
-                for (Person p : person){
-                    visitors.add(p.getName()+" "+p.getSurname());
+                for (Person p : person) {
+                    visitors.add(p.getName() + " " + p.getSurname());
                 }
-                System.out.println(visitors.size()+" visitors: "+visitors);
+                System.out.println(visitors.size() + " visitors: " + visitors);
                 break;
             case 2:
-                LinkedHashSet<Book> books = new LinkedHashSet<>();
-                for (Person p : person){
-                    books.addAll(Arrays.asList(p.getFavoriteBooks()));
+                //unique books from favorites
+                LinkedHashSet<String> bookNames = new LinkedHashSet<>();
+                for (Person p : person) {
+                    for (Book b : p.getFavoriteBooks()) {
+                        bookNames.add(b.getName());
+                    }
                 }
-                ArrayList<String> names = new ArrayList<>();
-                for (Book b : books){
-                    names.add(b.getName());
-                }
-                System.out.println(books.size()+" books: "+ names);
+                System.out.println(bookNames.size() + " books: " + bookNames);
                 break;
             case 3:
-                LinkedHashSet<Book> books1 = new LinkedHashSet<>();
-                for (Person p : person){
-                    books1.addAll(Arrays.asList(p.getFavoriteBooks()));
+                //sort by year
+                LinkedHashSet<Book> books = new LinkedHashSet<>();
+                for (Person p : person) {
+                    books.addAll(Arrays.asList(p.getFavoriteBooks()));
                 }
-                Comparator<Book> YC = new YearComparator();
-                TreeSet<Book> BCbY = new TreeSet<>(YC);
-                BCbY.addAll(books1);
+                Comparator<Book> YC = new YearComparator();//comparator of years
+                TreeSet<Book> BCbY = new TreeSet<>(YC);//array w comp
+                BCbY.addAll(books);
                 System.out.println(BCbY);
-
                 break;
             case 4:
-                for (Person p : person){
-                    for (Book b : p.getFavoriteBooks()){
-                        if(b.getAuthor().equals("Jane Austen")) System.out.println(p.getName());
+                //check if someone have book w author Jane Austen
+                for (Person p : person) {
+                    for (Book b : p.getFavoriteBooks()) {
+                        if (b.getAuthor().equals("Jane Austen")) System.out.println(p.getName());
                     }
                 }
                 break;
             case 5:
+                //max num of added books
                 Person readingExpert = person[0];
                 for (int i = 1; i < person.length; i++) {
-                    if (readingExpert.getFavoriteBooks().length < person[i].getFavoriteBooks().length) readingExpert = person[i];
+                    if (readingExpert.getFavoriteBooks().length < person[i].getFavoriteBooks().length)//finding max num
+                        readingExpert = person[i];
                 }
-                System.out.println(readingExpert.getName()+" "+readingExpert.getSurname()+" readed "+readingExpert.getFavoriteBooks().length+" books");
+                System.out.println(readingExpert.getName() + " " + readingExpert.getSurname() + " readed " + readingExpert.getFavoriteBooks().length + " books");
                 break;
             case 6:
+                //SMS
                 ArrayList<Person> smsAgree = new ArrayList<>();
                 double mid = 0.0;
                 for (int i = 0; i < person.length; i++) {
-                    if (person[i].isSubscribed()) smsAgree.add(person[i]);
+                    if (person[i].isSubscribed()) smsAgree.add(person[i]);//list of subscribed
                     mid += person[i].getFavoriteBooks().length;
-                    if(i == person.length-1) mid /= person.length;
+                    if (i == person.length - 1) mid /= person.length;//mid
                 }
 
-                ArrayList<SMS> smsList = new ArrayList<>();
+                ArrayList<SMS> smsList = new ArrayList<>();//generating sms list
                 for (Person p : smsAgree) {
-                    if(p.getFavoriteBooks().length > mid)  smsList.add(SMS.builder().number(p.getPhone()).message("You are bookworm").build());
-                    else if(p.getFavoriteBooks().length < mid)  smsList.add(SMS.builder().number(p.getPhone()).message("Read more").build());
+                    if (p.getFavoriteBooks().length > mid)
+                        smsList.add(SMS.builder().number(p.getPhone()).message("You are bookworm").build());
+                    else if (p.getFavoriteBooks().length < mid)
+                        smsList.add(SMS.builder().number(p.getPhone()).message("Read more").build());
                     else smsList.add(SMS.builder().number(p.getPhone()).message("Fine").build());
                 }
 
                 System.out.println(smsList);
-
                 break;
             default:
                 break;
-
         }
 
 
@@ -101,7 +106,7 @@ public class Main {
 }
 
 @Data
-class Book{
+class Book {
     private String name;
     private String author;
     private int publishingYear;
@@ -109,6 +114,7 @@ class Book{
     private String publisher;
 }
 
+//comparator bu year
 class YearComparator implements Comparator<Book> {
     @Override
     public int compare(Book b1, Book b2) {
@@ -117,7 +123,7 @@ class YearComparator implements Comparator<Book> {
 }
 
 @Data
-class Person{
+class Person {
     private String name;
     private String surname;
     private String phone;
@@ -127,7 +133,7 @@ class Person{
 
 @Data
 @Builder
-class SMS{
+class SMS {
     private String number;
     private String message;
 }
