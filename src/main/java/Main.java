@@ -48,6 +48,13 @@ public class Main {
         BCbY.addAll(books);
         System.out.println(BCbY.toString());
 
+        //4
+        for (Person p : person){
+            for (Book b : p.getFavoriteBooks()){
+                if(b.getAuthor().equals("Jane Austen")) System.out.println(p.getName());
+            }
+        }
+
 
     }
 }
